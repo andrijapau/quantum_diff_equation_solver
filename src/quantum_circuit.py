@@ -55,10 +55,10 @@ class LDESolver:
     def display_results(self):
         counts = self.result.get_counts()
         # print(self.N2)
-        probs = {string: (self.N ** (2)) * np.sqrt(count / self.shots) for string, count in counts.items()}
-        print(probs)
+        probs = {string: (self.N ** 2) * np.sqrt(count / self.shots) for string, count in counts.items()}
+        # print(probs)
         # self.x = max(probs['10000'], probs['00001'])
-        self.x = probs['10000']
+        self.x = probs['00001']
         self.y = probs['00000']
         # plot_histogram(self.result.get_counts(), title="LDE Solver", color='black')
         # plt.show()

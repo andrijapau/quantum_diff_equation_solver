@@ -4,7 +4,7 @@ from src.analytical_soln import *
 from src.quantum_circuit import *
 
 if __name__ == '__main__':
-    t = np.linspace(0.01, 5.01, 10)
+    t = np.linspace(0.01, 5.01, 25)
     # for t_ in t:
     num_of_anc_reg1, num_of_anc_reg2, num_of_work_qubits = 1, 3, 1
 
@@ -24,12 +24,22 @@ if __name__ == '__main__':
 
     circuit.draw_circuit()
 
-    plt.plot(t, x_C, 'k', label='Classical Solution')
-    plt.plot(t, x_Q, 'r', label='Quantum Solution')
+    plt.plot(t, x_C, 'k--', label='Analytic')
+    plt.plot(t, x_Q, 'r', label='Quantum')
     plt.legend(loc='best')
+    plt.xlabel(r"t")
+    plt.ylabel(r"x(t)")
+    plt.title("Position v.s. Time")
+
+    plt.savefig("./results/x(t).png", dpi=300)
     plt.show()
 
-    plt.plot(t, y_C, 'k', label='Classical Solution')
-    plt.plot(t, y_Q, 'r', label='Quantum Solution')
+    plt.plot(t, y_C, 'k--', label='Analytic')
+    plt.plot(t, y_Q, 'r', label='Quantum')
     plt.legend(loc='best')
+    plt.xlabel(r"t")
+    plt.ylabel(r"y(t)")
+    plt.title("Position v.s. Time")
+
+    plt.savefig("./results/y(t).png", dpi=300)
     plt.show()
