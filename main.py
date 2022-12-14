@@ -4,9 +4,9 @@ from src.analytical_soln import *
 from src.quantum_circuit import *
 
 if __name__ == '__main__':
-    t = np.linspace(0.01, 1.51, 10)
+    t = np.linspace(0.01, 2.51, 25)
     # for t_ in t:
-    num_of_anc_reg1, num_of_anc_reg2, num_of_work_qubits = 1, 4, 1
+    num_of_anc_reg1, num_of_anc_reg2, num_of_work_qubits = 1, 2, 1
 
     p0, b = (1 / (np.sqrt(2))) * np.array([1, 1]), (1 / (np.sqrt(2))) * np.array([1, 1])
 
@@ -48,4 +48,14 @@ if __name__ == '__main__':
     plt.title("XY Phase Space")
 
     plt.savefig("./results/x_vs_y.png", dpi=300)
+    plt.show()
+
+    x_C = np.array(x_C)
+    x_Q = np.array(x_Q)
+    plt.plot(t, np.abs((x_C - x_Q) / x_Q) * 100, 'k', label='Relative Error')
+    plt.legend(loc='best')
+    plt.xlabel(r"$t$, time")
+    plt.ylabel(r"$|\Delta x / x|$, (%)")
+    plt.title("Relative Error v.s. Time")
+    plt.savefig("./results/error.png", dpi=300)
     plt.show()

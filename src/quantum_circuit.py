@@ -53,7 +53,7 @@ class LDESolver:
 
     def draw_circuit(self):
         """"""
-        self.circuit.draw('mpl', style={'name': 'bw', 'dpi': 350})
+        self.circuit.draw('mpl', style={'name': 'bw', 'dpi': 350}, filename="./results/circuit.png")
         plt.show()
 
     def display_results(self):
@@ -63,12 +63,12 @@ class LDESolver:
         print(probs, self.N)
         # self.x = min(probs['100000'], probs['000001'])
         y_adj, x_adj = 0, 0
-        if '000001' in probs.keys():
-            y_adj = probs['000001']
-        if '100001' in probs.keys():
-            x_adj = probs['100001']
-        self.y = (self.N ** 2) * np.sqrt(probs['100000'] + y_adj)
-        self.x = (self.N ** 2) * np.sqrt(probs['000000'] + x_adj)
+        if '0001' in probs.keys():
+            y_adj = probs['0001']
+        if '1001' in probs.keys():
+            x_adj = probs['1001']
+        self.y = (self.N ** 2) * np.sqrt(probs['1000'] + y_adj)
+        self.x = (self.N ** 2) * np.sqrt(probs['0000'] + x_adj)
         # self.x = probs['00001']
         # self.y = min(probs['000000'], probs['100001'])
         # plot_histogram(self.result.get_counts(), title="LDE Solver", color='black')
@@ -79,14 +79,14 @@ class LDESolver:
         self.circuit.measure_all()
 
     def entanglement(self):
-        order = 4
-        for i in range(2 ** order - 1):
+        order = 2
+        for i in range(2 ** order):
             # print(self.circuit)
             if i % 2 != 0:
                 ctrl = "".join(bin(i)[2:][::-1].ljust(order, '0'))
                 self.circuit.append(
                     XGate().control(num_ctrl_qubits=order, ctrl_state=ctrl),
-                    [self.anc_reg2[0], self.anc_reg2[1], self.anc_reg2[2], self.anc_reg2[3], self.work_qubit_reg[-1]]
+                    [self.anc_reg2[0], self.anc_reg2[1], self.work_qubit_reg[-1]]
                 )
         # self.circuit.append(
         #     XGate().control(num_ctrl_qubits=3, ctrl_state=3),
@@ -105,38 +105,38 @@ class LDESolver:
     # self.circuit.cx(self.anc_reg2, self.work_qubit_reg, ctrl_state='1')
 
     def encode(self):
-        S1_circuit = QuantumCircuit(5)
+        S1_circuit = QuantumCircuit(3)
         # Ux Ub
-        S1_circuit.h(4)
+        S1_circuit.h(2)
         # Vs1 Vs2
-        S1_circuit.unitary(self.v_S1_U, [0, 1, 2, 3], label='VS1')
+        S1_circuit.unitary(self.v_S1_U, [0, 1], label='VS1')
         S1_gate = S1_circuit.to_gate().control(1, ctrl_state='0')
 
-        S2_circuit = QuantumCircuit(5)
+        S2_circuit = QuantumCircuit(3)
         # S2_circuit.x(4)
-        S2_circuit.h(4)
-        S2_circuit.unitary(self.v_S2_U, [0, 1, 2, 3], label='VS2')
+        S2_circuit.h(2)
+        S2_circuit.unitary(self.v_S2_U, [0, 1], label='VS2')
         S2_gate = S2_circuit.to_gate().control(1, ctrl_state='1')
         # print(S2_circuit)
 
         self.circuit.unitary(self.V_U, 0, label='V')
-        self.circuit.append(S1_gate, [0, 1, 2, 3, 4, 5])
-        self.circuit.append(S2_gate, [0, 1, 2, 3, 4, 5])
+        self.circuit.append(S1_gate, [0, 1, 2, 3])
+        self.circuit.append(S2_gate, [0, 1, 2, 3])
 
     def decode(self):
 
-        S1_circuit = QuantumCircuit(4)
+        S1_circuit = QuantumCircuit(3)
         # Vs1 Vs2
-        S1_circuit.unitary(self.w_S1_U, [0, 1, 2, 3], label='WS1')
+        S1_circuit.unitary(self.w_S1_U, [0, 1], label='WS1')
         S1_gate = S1_circuit.to_gate().control(1, ctrl_state='0')
 
         # print(S1_circuit)
-        S2_circuit = QuantumCircuit(4)
-        S2_circuit.unitary(self.w_S2_U, [0, 1, 2, 3], label='WS2')
+        S2_circuit = QuantumCircuit(3)
+        S2_circuit.unitary(self.w_S2_U, [0, 1], label='WS2')
         S2_gate = S2_circuit.to_gate().control(1, ctrl_state='1')
         # print(S2_circuit)
-        self.circuit.append(S1_gate, [0, 1, 2, 3, 4])
-        self.circuit.append(S2_gate, [0, 1, 2, 3, 4])
+        self.circuit.append(S1_gate, [0, 1, 2, 3])
+        self.circuit.append(S2_gate, [0, 1, 2, 3])
         self.circuit.unitary(self.W_U, 0, label='W')
 
         # S1_circuit = QuantumCircuit(3)
@@ -167,37 +167,13 @@ class LDESolver:
             [[np.sqrt(self.e(t, 0, order, noSum=True, index=0)),
               np.sqrt(self.e(t, 1, order, noSum=True, index=1)),
               np.sqrt(self.e(t, 2, order, noSum=True, index=2)),
-              np.sqrt(self.e(t, 3, order, noSum=True, index=3)),
-              np.sqrt(self.e(t, 0, order, noSum=True, index=4)),
-              np.sqrt(self.e(t, 1, order, noSum=True, index=5)),
-              np.sqrt(self.e(t, 2, order, noSum=True, index=6)),
-              np.sqrt(self.e(t, 3, order, noSum=True, index=7)),
-              np.sqrt(self.e(t, 0, order, noSum=True, index=8)),
-              np.sqrt(self.e(t, 1, order, noSum=True, index=9)),
-              np.sqrt(self.e(t, 2, order, noSum=True, index=10)),
-              np.sqrt(self.e(t, 3, order, noSum=True, index=11)),
-              np.sqrt(self.e(t, 0, order, noSum=True, index=12)),
-              np.sqrt(self.e(t, 1, order, noSum=True, index=13)),
-              np.sqrt(self.e(t, 2, order, noSum=True, index=14)),
-              np.sqrt(self.e(t, 3, order, noSum=True, index=15))]]
+              np.sqrt(self.e(t, 3, order, noSum=True, index=3))]]
         )
 
         v_S2 = np.array(
             [[np.sqrt(self.e(t, 1, order, noSum=True, index=1)),
               np.sqrt(self.e(t, 2, order, noSum=True, index=2)),
               np.sqrt(self.e(t, 3, order, noSum=True, index=3)),
-              np.sqrt(self.e(t, 0, order, noSum=True, index=4)),
-              np.sqrt(self.e(t, 1, order, noSum=True, index=5)),
-              np.sqrt(self.e(t, 2, order, noSum=True, index=6)),
-              np.sqrt(self.e(t, 3, order, noSum=True, index=7)),
-              np.sqrt(self.e(t, 0, order, noSum=True, index=8)),
-              np.sqrt(self.e(t, 1, order, noSum=True, index=9)),
-              np.sqrt(self.e(t, 2, order, noSum=True, index=10)),
-              np.sqrt(self.e(t, 3, order, noSum=True, index=11)),
-              np.sqrt(self.e(t, 0, order, noSum=True, index=12)),
-              np.sqrt(self.e(t, 1, order, noSum=True, index=13)),
-              np.sqrt(self.e(t, 2, order, noSum=True, index=14)),
-              np.sqrt(self.e(t, 3, order, noSum=True, index=15)),
               0]]
         )
 
