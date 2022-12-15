@@ -199,6 +199,7 @@ class LDESolver:
             return (t ** index) / (math.factorial(index))
 
     def create_unitary(self, v):
+        # From https://math.stackexchange.com/questions/4160055/create-a-unitary-matrix-out-of-a-column-vector
         dim = v.size
         # Return identity if v is a multiple of e1
         if v[0][0] and not np.any(v[0][1:]):
