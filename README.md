@@ -1,2 +1,2 @@
-# QIC710-Final-Presentation
-Final Presentation on using Quantum Circuits to solve Linear Differential Equations using Qiskit.
+# Quantum Differential Equation Solver
+Using a quantum circuits to solve linear differential equations (LDEs) using Qiskit.
